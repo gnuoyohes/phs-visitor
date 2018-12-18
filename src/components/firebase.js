@@ -11,21 +11,11 @@ const config = {
   messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
 };
 
-class Firebase {
-  constructor() {
-    app.initializeApp(config);
+app.initializeApp(config);
 
-    this.auth = app.auth();
-    this.db = app.database();
-  }
+const firebase = {
+  db: app.database(),
+  auth: app.auth(),
+};
 
-  signIn = (email, password) => {
-    this.auth.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
-      console.log(error);
-    });
-  }
-
-  signOut = () => this.auth.signOut();
-}
-
-export default Firebase;
+export default firebase;

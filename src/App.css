@@ -5,3 +5,11 @@
 .div {
   align-content: center;
 }
+
+* {
+    outline:none;
+}
+
+.modal-div {
+  padding-left: auto;
+}

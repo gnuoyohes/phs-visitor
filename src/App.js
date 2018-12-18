@@ -14,16 +14,17 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Paper from '@material-ui/core/Paper';
-
-import ReactModal from 'react-modal';
+import Modal from '@material-ui/core/Modal';
+import Slide from '@material-ui/core/Slide';
 
 import CurrentVisitors from './CurrentVisitors';
 import PreviousVisitors from './PreviousVisitors';
-import LoginModal from './LoginModal';
-import AboutModal from './AboutModal';
+import LoginForm from './LoginForm';
+import About from './About';
 
 import colors from './constants/colors';
 import routes from './constants/routes';
+import firebase from './components/firebase';
 
 import './App.css';
 
@@ -35,9 +36,24 @@ const styles = {
     marginLeft: -12,
     marginRight: 20,
   },
+  button: {
+    marginLeft: '20px',
+  },
   paper: {
     flexGrow: 1,
     paddingTop: 65,
+  },
+  tab: {
+    flexGrow: 1,
+  },
+  modalPaper: {
+    width: '30%',
+    height: '40%',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    marginTop: '10%',
+    marginBottom: 'auto',
+    padding: '10px',
   },
 };
 
@@ -48,11 +64,13 @@ const theme = createMuiTheme({
     },
     secondary: {
       main: colors.secondaryColor,
-      contrastText: colors.primaryColor,
+      contrastText: colors.secondaryContrastText,
     },
   },
-  status: {
-    danger: 'orange',
+  props: {
+    MuiButtonBase: {
+      disableRipple: true,
+    },
   },
 });
 
@@ -62,6 +80,8 @@ class App extends Component {
     tabValue: 0,
     showLoginModal: false,
     showAboutModal: false,
+    loggedIn: false,
+    currentUser: "",
   };
 
   handleMenuClick = event => {
@@ -77,7 +97,8 @@ class App extends Component {
   };
 
   handleOpenLoginModal = () => {
-    this.setState({ showLoginModal: true });
+    if (!this.state.showAboutModal)
+      this.setState({ showLoginModal: true });
   };
 
   handleCloseLoginModal = () => {
@@ -85,11 +106,30 @@ class App extends Component {
   };
 
   handleOpenAboutModal = () => {
-    this.setState({ showAboutModal: true });
+    if (!this.state.showLoginModal)
+      this.setState({ showAboutModal: true });
   };
 
   handleCloseAboutModal = () => {
     this.setState({ showAboutModal: false });
+  };
+
+  handleLogin = (email, password) => {
+    firebase.auth.signInWithEmailAndPassword(email, password).then(() => {
+      this.setState({ loggedIn: true, currentUser: email });
+      this.handleCloseLoginModal();
+    }).catch((error) => {
+      console.log(error);
+    });
+    return this.loggedIn;
+  };
+
+  handleLogout = () => {
+    firebase.auth.signOut().then(() => {
+      this.setState({ loggedIn: false, currentUser: "" });
+    }).catch((error) => {
+      console.log(error);
+    });
   };
 
   render() {
@@ -114,28 +154,54 @@ class App extends Component {
                 <Typography variant="h4" color="inherit" style={styles.grow}>
                   PHS Visitor Sign-In
                 </Typography>
-                <div style={{paddingRight: 10}}>
-                  <Button variant="contained" color="secondary" onClick={this.handleOpenLoginModal}>Login</Button>
-                </div>
-                <Button color="inherit" onClick={this.handleOpenAboutModal}>About</Button>
+                {
+                  this.state.loggedIn ?
+                    <Typography variant="subtitle1" color="inherit">
+                      Hello, {this.state.currentUser}
+                    </Typography>
+                  : null
+                }
+                {
+                  this.state.loggedIn ?
+                    <Button variant="contained" color="secondary" onClick={this.handleLogout} style={styles.button}>Logout</Button>
+                  :
+                    <Button variant="contained" color="secondary" onClick={this.handleOpenLoginModal} style={styles.button}>Login</Button>
+                }
+                <Button color="inherit" onClick={this.handleOpenAboutModal} style={styles.button}>About</Button>
               </Toolbar>
             </AppBar>
             <Paper style={styles.paper} square>
               <Tabs value={this.state.tabValue} onChange={this.handleTabChange} indicatorColor="primary" textColor="primary" centered>
-                <Tab style={styles.grow} label="Current Visitors" component={Link} to={routes.currentVisitors}/>
-                <Tab style={styles.grow} label="Previous Visitors" component={Link} to={routes.previousVisitors}/>
+                <Tab style={styles.tab} label="Current Visitors" component={Link} to={routes.currentVisitors}/>
+                <Tab style={styles.tab} label="Previous Visitors" component={Link} to={routes.previousVisitors}/>
               </Tabs>
             </Paper>
             <Route exact path={routes.currentVisitors} component={CurrentVisitors} />
             <Route path={routes.previousVisitors} component={PreviousVisitors} />
-            <ReactModal isOpen={this.state.showLoginModal}>
-              <LoginModal/>
-              <Button variant="contained" color="primary" onClick={this.handleCloseLoginModal}>Close</Button>
-            </ReactModal>
-            <ReactModal isOpen={this.state.showAboutModal}>
-              <AboutModal/>
-              <Button variant="contained" color="primary" onClick={this.handleCloseAboutModal}>Close</Button>
-            </ReactModal>
+            <div className="modal-div">
+              <Modal
+                open={this.state.showLoginModal}
+                onClose={this.handleCloseLoginModal}
+                disableAutoFocus
+              >
+                <Slide direction="down" in={this.state.showLoginModal} mountOnEnter unmountOnExit>
+                  <Paper style={styles.modalPaper} elevation={24}>
+                    <LoginForm close={this.handleCloseLoginModal} login={this.handleLogin}/>
+                  </Paper>
+                </Slide>
+              </Modal>
+              <Modal
+                open={this.state.showAboutModal}
+                onClose={this.handleCloseAboutModal}
+                disableAutoFocus
+              >
+                <Slide direction="down" in={this.state.showAboutModal} mountOnEnter unmountOnExit>
+                  <Paper style={styles.modalPaper} elevation={24}>
+                    <About close={this.handleCloseAboutModal}/>
+                  </Paper>
+                </Slide>
+              </Modal>
+            </div>
           </div>
         </MuiThemeProvider>
       </Router>
