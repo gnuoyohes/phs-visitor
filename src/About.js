@@ -22,12 +22,12 @@ class About extends Component {
         </IconButton>
         <div style={styles.textBody}>
           <Typography variant="h5" color="inherit">
-            About
+            PHS Visitor Sign-In
           </Typography>
           <br/><br/>
           <Typography variant="h7" color="inherit">
             Developed by Seho Young, Princeton University '19 <br/><br/>
-            Contact <a href="mailto:sehoy@princeton.edu">sehoy@princeton.edu</a>
+            Contact <a href="mailto:sehoy@princeton.edu" target="_blank">sehoy@princeton.edu</a>
           </Typography>
         </div>
       </div>

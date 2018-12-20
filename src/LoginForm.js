@@ -4,6 +4,9 @@ import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+
+import firebase from './components/firebase';
 
 const styles = {
   closeButton: {
@@ -16,15 +19,22 @@ const styles = {
     width: '70%',
   },
   button: {
-    marginTop: '20%',
+    marginTop: '10%',
+  },
+  authFailText: {
+    color: "red",
   },
 }
 
 class LoginForm extends Component {
-  state = {
-    email: "",
-    password: "",
-  };
+  constructor() {
+    super();
+    this.state = {
+      email: "",
+      password: "",
+      loginFail: false,
+    };
+  }
 
   handleChange = name => event => {
     this.setState({
@@ -34,7 +44,12 @@ class LoginForm extends Component {
 
   handleSubmit = event => {
     event.preventDefault();
-    this.props.login(this.state.email, this.state.password);
+    firebase.auth.signInWithEmailAndPassword(this.state.email, this.state.password).then(() => {
+      this.props.close();
+    }).catch((error) => {
+      console.log(error);
+      this.setState({loginFail: true});
+    });
   };
 
   render() {
@@ -45,6 +60,7 @@ class LoginForm extends Component {
         </IconButton>
         <form style={styles.form} onSubmit={this.handleSubmit}>
           <TextField
+            autoFocus
             style={styles.textField}
             type="email"
             required
@@ -62,8 +78,16 @@ class LoginForm extends Component {
             onChange={this.handleChange('password')}
             margin="normal"
           />
+          {
+            this.state.loginFail ?
+              <Typography variant="caption" style={styles.authFailText}>
+                Authentication failed. <br/>
+                Please contact <a href="mailto:sehoy@princeton.edu" target="_blank">sehoy@princeton.edu</a> to have your account added.
+              </Typography>
+            : null
+          }
           <div style={styles.button}>
-            <Button variant="contained" color="primary" onClick={this.handleSubmit} type="submit">
+            <Button variant="contained" color="primary" type="submit">
               Submit
             </Button>
           </div>

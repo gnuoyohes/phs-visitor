@@ -7,7 +7,7 @@ class PreviousVisitors extends Component {
   render() {
     return (
       <Typography variant="h1" color="inherit">
-        Previous Visitors
+        Past Visitors
       </Typography>
     );
   }

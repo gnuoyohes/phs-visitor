@@ -47,8 +47,8 @@ const styles = {
     flexGrow: 1,
   },
   modalPaper: {
-    width: '30%',
-    height: '40%',
+    width: '400px',
+    height: '275px',
     marginLeft: 'auto',
     marginRight: 'auto',
     marginTop: '10%',
@@ -75,14 +75,27 @@ const theme = createMuiTheme({
 });
 
 class App extends Component {
-  state = {
-    menuAnchor: null,
-    tabValue: 0,
-    showLoginModal: false,
-    showAboutModal: false,
-    loggedIn: false,
-    currentUser: "",
-  };
+  constructor() {
+    super();
+    this.state = {
+      menuAnchor: null,
+      tabValue: 0,
+      showLoginModal: false,
+      showAboutModal: false,
+      loggedIn: false,
+      currentUser: "",
+    };
+  }
+
+  componentDidMount() {
+    firebase.auth.onAuthStateChanged((user) => {
+      if (user) {
+        this.setState({ loggedIn: true, currentUser: user.email });
+      } else {
+        this.setState({ loggedIn: false, currentUser: "" });
+      }
+    });
+  }
 
   handleMenuClick = event => {
     this.setState({ menuAnchor: event.currentTarget });
@@ -114,20 +127,8 @@ class App extends Component {
     this.setState({ showAboutModal: false });
   };
 
-  handleLogin = (email, password) => {
-    firebase.auth.signInWithEmailAndPassword(email, password).then(() => {
-      this.setState({ loggedIn: true, currentUser: email });
-      this.handleCloseLoginModal();
-    }).catch((error) => {
-      console.log(error);
-    });
-    return this.loggedIn;
-  };
-
   handleLogout = () => {
-    firebase.auth.signOut().then(() => {
-      this.setState({ loggedIn: false, currentUser: "" });
-    }).catch((error) => {
+    firebase.auth.signOut().catch((error) => {
       console.log(error);
     });
   };
@@ -172,11 +173,11 @@ class App extends Component {
             </AppBar>
             <Paper style={styles.paper} square>
               <Tabs value={this.state.tabValue} onChange={this.handleTabChange} indicatorColor="primary" textColor="primary" centered>
-                <Tab style={styles.tab} label="Current Visitors" component={Link} to={routes.currentVisitors}/>
-                <Tab style={styles.tab} label="Previous Visitors" component={Link} to={routes.previousVisitors}/>
+                <Tab style={styles.tab} label="Today's Visitors" component={Link} to={routes.currentVisitors}/>
+                <Tab style={styles.tab} label="Past Visitors" component={Link} to={routes.previousVisitors}/>
               </Tabs>
             </Paper>
-            <Route exact path={routes.currentVisitors} component={CurrentVisitors} />
+            <Route exact path={routes.currentVisitors} render={(props) => <CurrentVisitors {...props} loggedIn={this.state.loggedIn}/>} />
             <Route path={routes.previousVisitors} component={PreviousVisitors} />
             <div className="modal-div">
               <Modal
@@ -186,7 +187,7 @@ class App extends Component {
               >
                 <Slide direction="down" in={this.state.showLoginModal} mountOnEnter unmountOnExit>
                   <Paper style={styles.modalPaper} elevation={24}>
-                    <LoginForm close={this.handleCloseLoginModal} login={this.handleLogin}/>
+                    <LoginForm close={this.handleCloseLoginModal}/>
                   </Paper>
                 </Slide>
               </Modal>
