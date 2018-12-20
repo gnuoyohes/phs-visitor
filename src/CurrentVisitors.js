@@ -50,12 +50,6 @@ const styles = {
     marginBottom: 'auto',
     padding: '10px',
   },
-  nameCell: {
-    width: '150px',
-  },
-  descriptionCell: {
-    width: '400px',
-  },
 }
 
 const theme = createMuiTheme({
@@ -157,15 +151,6 @@ class CurrentVisitors extends Component {
     const tableColumns = [
       {
         name: "Name",
-        options: {
-          customBodyRender: (value, tableMeta, updateValue) => {
-            return (
-              <div style={styles.nameCell}>
-                {value}
-              </div>
-            );
-          },
-        },
       },
       {
         name: "Time In",
@@ -175,34 +160,30 @@ class CurrentVisitors extends Component {
       },
       {
         name: "Description",
-        options: {
-          customBodyRender: (value, tableMeta, updateValue) => {
-            return (
-              <div style={styles.descriptionCell}>
-                {value}
-              </div>
-            );
-          },
-        },
       },
       {
-        name: "Actions",
+        name: "",
         options: {
           download: false,
           customBodyRender: (value, tableMeta, updateValue) => {
+            const signedIn = tableMeta.rowData[2] == "";
             return (
               this.props.loggedIn ?
-                <div>
-                <Tooltip title="Sign Out">
-                  <IconButton color="default" onClick={() => {if(window.confirm('Are you sure?')) this.handleSignOutVisitor(value)}}>
-                    <CheckBoxIcon/>
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Remove">
-                  <IconButton color="secondary" onClick={() => {if(window.confirm('Are you sure?')) this.handleRemoveVisitor(value)}}>
-                    <CancelIcon/>
-                  </IconButton>
-                </Tooltip>
+                <div style={{float: 'right'}}>
+                  {
+                    signedIn ?
+                      <Tooltip title="Sign Out">
+                        <IconButton color="default" onClick={() => {if(window.confirm('Are you sure?')) this.handleSignOutVisitor(value)}}>
+                          <CheckBoxIcon/>
+                        </IconButton>
+                      </Tooltip>
+                    : ""
+                  }
+                  <Tooltip title="Remove">
+                    <IconButton color="secondary" onClick={() => {if(window.confirm('Are you sure?')) this.handleRemoveVisitor(value)}}>
+                      <CancelIcon/>
+                    </IconButton>
+                  </Tooltip>
                 </div>
               : ""
             )
