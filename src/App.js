@@ -1,6 +1,11 @@
 import React, { Component } from 'react';
 
-import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
+import { Route, Link } from 'react-router-dom';
+import { withRouter } from 'react-router'
+
+import { MuiPickersUtilsProvider } from 'material-ui-pickers';
+// import DateFnsUtils from '@date-io/date-fns';
+import MomentUtils from '@date-io/moment';
 
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -95,6 +100,23 @@ class App extends Component {
         this.setState({ loggedIn: false, currentUser: "" });
       }
     });
+    this.checkPath();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.location !== prevProps.location) {
+      this.checkPath();
+    }
+  }
+
+  checkPath = () => {
+    const pathname = this.props.location.pathname;
+    if (pathname === routes.currentVisitors) {
+      this.setState({ tabValue: 0 })
+    }
+    else if (pathname === routes.previousVisitors) {
+      this.setState({ tabValue: 1 })
+    }
   }
 
   handleMenuClick = event => {
@@ -135,8 +157,8 @@ class App extends Component {
 
   render() {
     return (
-      <Router>
-        <MuiThemeProvider theme={theme}>
+      <MuiThemeProvider theme={theme}>
+        <MuiPickersUtilsProvider utils={MomentUtils}>
           <div className="div">
             <AppBar position="fixed" color="primary" style={styles.grow}>
               <Toolbar>
@@ -204,10 +226,10 @@ class App extends Component {
               </Modal>
             </div>
           </div>
-        </MuiThemeProvider>
-      </Router>
+        </MuiPickersUtilsProvider>
+      </MuiThemeProvider>
     );
   }
 }
 
-export default App;
+export default withRouter(App);

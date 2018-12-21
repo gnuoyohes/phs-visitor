@@ -39,6 +39,7 @@ const styles = {
     marginTop: '10%',
   },
   addButton: {
+    marginLeft: '30px',
     marginBottom: '25px',
   },
   modalPaper: {
@@ -70,7 +71,7 @@ const theme = createMuiTheme({
 
 
 
-const getDateString = () => {
+const getCurrentDateString = () => {
   var d = new Date();
   var dateString = "" + (d.getMonth()+1) + d.getDate() + d.getFullYear();
   return dateString;
@@ -89,7 +90,7 @@ class CurrentVisitors extends Component {
   }
 
   componentDidMount() {
-    firebase.db.ref('data').child(getDateString()).on("value", (snapshot) => {
+    firebase.db.ref('data').child(getCurrentDateString()).on("value", (snapshot) => {
       var dataTemp = [];
       snapshot.forEach(function(d) {
         dataTemp.push([
@@ -102,6 +103,10 @@ class CurrentVisitors extends Component {
       });
       this.setState({data: dataTemp});
     });
+
+    if (localStorage.hasOwnProperty('rowsPerPage')) {
+      this.setState({rowsPerPage: localStorage.getItem('rowsPerPage')});
+    }
   }
 
   handleChange = name => event => {
@@ -123,7 +128,7 @@ class CurrentVisitors extends Component {
     var d = new Date();
     var time = d.getTime();
     var timeIn = d.toLocaleTimeString();
-    firebase.db.ref('data').child(getDateString()).child(time).set({
+    firebase.db.ref('data').child(getCurrentDateString()).child(time).set({
       'name': this.state.name,
       'description': this.state.description,
       'timeIn': timeIn,
@@ -134,20 +139,27 @@ class CurrentVisitors extends Component {
   };
 
   handleRemoveVisitor = (key) => {
-    firebase.db.ref('data').child(getDateString()).child(key).remove();
+    firebase.db.ref('data').child(getCurrentDateString()).child(key).remove();
   };
 
   handleSignOutVisitor = (key) => {
     var d = new Date();
     var timeOut = d.toLocaleTimeString();
-    firebase.db.ref('data').child(getDateString()).child(key).child('timeOut').set(timeOut);
+    firebase.db.ref('data').child(getCurrentDateString()).child(key).child('timeOut').set(timeOut);
   };
 
   handleRowClick = (rowData) => {
     console.log(rowData);
   };
 
+  handleRowsPerPageChange = (numberOfRows) => {
+    this.setState({rowsPerPage: numberOfRows});
+    localStorage.setItem('rowsPerPage', numberOfRows);
+  };
+
   render() {
+    const currentDateString = new Date().toDateString();
+
     const tableColumns = [
       {
         name: "Name",
@@ -166,7 +178,7 @@ class CurrentVisitors extends Component {
         options: {
           download: false,
           customBodyRender: (value, tableMeta, updateValue) => {
-            const signedIn = tableMeta.rowData[2] == "";
+            const signedIn = tableMeta.rowData[2] === "";
             return (
               this.props.loggedIn ?
                 <div style={{float: 'right'}}>
@@ -200,7 +212,7 @@ class CurrentVisitors extends Component {
       rowsPerPageOptions: [10, 25, 50],
       onRowClick: (rowData) => this.handleRowClick(rowData),
       rowsPerPage: this.state.rowsPerPage,
-      onChangeRowsPerPage: (numberOfRows) => this.setState({rowsPerPage: numberOfRows}),
+      onChangeRowsPerPage: this.handleRowsPerPageChange,
     };
 
     return (
@@ -217,7 +229,7 @@ class CurrentVisitors extends Component {
             : null
           }
           <MUIDataTable
-            title={"Today's Visitors"}
+            title={currentDateString}
             data={this.state.data}
             columns={tableColumns}
             options={tableOptions}
