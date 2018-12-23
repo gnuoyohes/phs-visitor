@@ -30,7 +30,6 @@ class PreviousVisitors extends Component {
   constructor() {
     super();
     var date = new Date();
-    date.setDate(date.getDate()-1);
     this.state = {
       selectedDate: date,
       data: [],
@@ -39,14 +38,15 @@ class PreviousVisitors extends Component {
   }
 
   componentDidMount() {
-    this.getData(getDateString(this.state.selectedDate));
-
     if (localStorage.hasOwnProperty('rowsPerPage')) {
       this.setState({rowsPerPage: localStorage.getItem('rowsPerPage')});
     }
+    var d = new Date();
     if (localStorage.hasOwnProperty('selectedDate')) {
-      this.setState({selectedDate: new Date(localStorage.getItem('selectedDate'))});
+      d = new Date(localStorage.getItem('selectedDate'))
     }
+    this.setState({selectedDate: d});
+    this.getData(getDateString(d));
   }
 
   handleDateChange = date => {
@@ -57,7 +57,7 @@ class PreviousVisitors extends Component {
   };
 
   getData = (dateString) => {
-    firebase.db.ref('data').child(dateString).on("value", (snapshot) => {
+    firebase.db.ref('data').child(dateString).once("value", (snapshot) => {
       var dataTemp = [];
       snapshot.forEach(function(d) {
         dataTemp.push([
