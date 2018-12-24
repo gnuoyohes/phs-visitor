@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import { Route, Link } from 'react-router-dom';
+import { Route, Link, Switch } from 'react-router-dom';
 import { withRouter } from 'react-router'
 
 import { MuiPickersUtilsProvider } from 'material-ui-pickers';
@@ -22,10 +22,14 @@ import Paper from '@material-ui/core/Paper';
 import Modal from '@material-ui/core/Modal';
 import Slide from '@material-ui/core/Slide';
 
+import { isMobile } from "react-device-detect";
+
 import CurrentVisitors from './CurrentVisitors';
 import PreviousVisitors from './PreviousVisitors';
 import LoginForm from './LoginForm';
 import About from './About';
+import Route404 from './Route404';
+import AppMobile from './AppMobile';
 
 import colors from './constants/colors';
 import routes from './constants/routes';
@@ -112,10 +116,13 @@ class App extends Component {
   checkPath = () => {
     const pathname = this.props.location.pathname;
     if (pathname === routes.currentVisitors) {
-      this.setState({ tabValue: 0 })
+      this.setState({ tabValue: 0 });
     }
     else if (pathname === routes.previousVisitors) {
-      this.setState({ tabValue: 1 })
+      this.setState({ tabValue: 1 });
+    }
+    else {
+      this.setState({ tabValue: -1 });
     }
   }
 
@@ -156,6 +163,9 @@ class App extends Component {
   };
 
   render() {
+    if (isMobile) {
+      return (<AppMobile />);
+    }
     return (
       <MuiThemeProvider theme={theme}>
         <MuiPickersUtilsProvider utils={MomentUtils}>
@@ -199,8 +209,11 @@ class App extends Component {
                 <Tab style={styles.tab} label="Past Visitors" component={Link} to={routes.previousVisitors}/>
               </Tabs>
             </Paper>
-            <Route exact path={routes.currentVisitors} render={(props) => <CurrentVisitors {...props} loggedIn={this.state.loggedIn}/>} />
-            <Route path={routes.previousVisitors} component={PreviousVisitors} />
+            <Switch>
+              <Route exact path={routes.currentVisitors} render={(props) => <CurrentVisitors {...props} loggedIn={this.state.loggedIn}/>} />
+              <Route path={routes.previousVisitors} component={PreviousVisitors} />
+              <Route component={Route404} />
+            </Switch>
             <div className="modal-div">
               <Modal
                 open={this.state.showLoginModal}

@@ -1,6 +1,6 @@
 const routes = {
   currentVisitors: "/",
-  previousVisitors: "/previous-visitors",
+  previousVisitors: "/past-visitors",
 };
 
 export default routes;

@@ -104,8 +104,8 @@ class CurrentVisitors extends Component {
       this.setState({data: dataTemp});
     });
 
-    if (localStorage.hasOwnProperty('rowsPerPage')) {
-      this.setState({rowsPerPage: localStorage.getItem('rowsPerPage')});
+    if (sessionStorage.hasOwnProperty('rowsPerPage')) {
+      this.setState({rowsPerPage: sessionStorage.getItem('rowsPerPage')});
     }
   }
 
@@ -154,7 +154,7 @@ class CurrentVisitors extends Component {
 
   handleRowsPerPageChange = (numberOfRows) => {
     this.setState({rowsPerPage: numberOfRows});
-    localStorage.setItem('rowsPerPage', numberOfRows);
+    sessionStorage.setItem('rowsPerPage', numberOfRows);
   };
 
   render() {

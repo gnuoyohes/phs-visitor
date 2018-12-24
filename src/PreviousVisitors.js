@@ -38,12 +38,12 @@ class PreviousVisitors extends Component {
   }
 
   componentDidMount() {
-    if (localStorage.hasOwnProperty('rowsPerPage')) {
-      this.setState({rowsPerPage: localStorage.getItem('rowsPerPage')});
+    if (sessionStorage.hasOwnProperty('rowsPerPage2')) {
+      this.setState({rowsPerPage: sessionStorage.getItem('rowsPerPage2')});
     }
     var d = new Date();
-    if (localStorage.hasOwnProperty('selectedDate')) {
-      d = new Date(localStorage.getItem('selectedDate'))
+    if (sessionStorage.hasOwnProperty('selectedDate')) {
+      d = new Date(sessionStorage.getItem('selectedDate'))
     }
     this.setState({selectedDate: d});
     this.getData(getDateString(d));
@@ -52,7 +52,7 @@ class PreviousVisitors extends Component {
   handleDateChange = date => {
     var d = new Date(date);
     this.setState({ selectedDate: d });
-    localStorage.setItem('selectedDate', d.toString());
+    sessionStorage.setItem('selectedDate', d.toString());
     this.getData(getDateString(d));
   };
 
@@ -77,7 +77,7 @@ class PreviousVisitors extends Component {
 
   handleRowsPerPageChange = (numberOfRows) => {
     this.setState({rowsPerPage: numberOfRows});
-    localStorage.setItem('rowsPerPage', numberOfRows);
+    sessionStorage.setItem('rowsPerPage2', numberOfRows);
   };
 
   render() {
