@@ -21,6 +21,7 @@ import Tab from '@material-ui/core/Tab';
 import Paper from '@material-ui/core/Paper';
 import Modal from '@material-ui/core/Modal';
 import Slide from '@material-ui/core/Slide';
+import { default as MuiSwitch } from '@material-ui/core/Switch';
 
 import { isMobile } from "react-device-detect";
 
@@ -93,6 +94,7 @@ class App extends Component {
       showAboutModal: false,
       loggedIn: false,
       currentUser: "",
+      printOn: false,
     };
   }
 
@@ -105,6 +107,9 @@ class App extends Component {
       }
     });
     this.checkPath();
+    if (sessionStorage.hasOwnProperty('printOn')) {
+      this.setState({printOn: sessionStorage.getItem('printOn')});
+    }
   }
 
   componentDidUpdate(prevProps) {
@@ -162,6 +167,12 @@ class App extends Component {
     });
   };
 
+  togglePrint = () => {
+    var newValue = !this.state.printOn
+    sessionStorage.setItem('printOn', newValue);
+    this.setState({ printOn: newValue });
+  };
+
   render() {
     if (isMobile) {
       return (<AppMobile />);
@@ -181,8 +192,17 @@ class App extends Component {
                   open={Boolean(this.state.menuAnchor)}
                   onClose={this.handleMenuClose}
                 >
-                  <MenuItem onClick={this.handleMenuClose}>Menu Item 1</MenuItem>
-                  <MenuItem onClick={this.handleMenuClose}>Menu Item 2</MenuItem>
+                  <MenuItem onClick={this.togglePrint}>
+                    <Typography variant="subtitle1" color="inherit">
+                      Toggle Print
+                    </Typography>
+                    <MuiSwitch
+                      checked={this.state.printOn}
+                      onChange={() => this.togglePrint}
+                      value="Toggle Print"
+                      color="primary"
+                    />
+                  </MenuItem>
                 </Menu>
                 <Typography variant="h4" color="inherit" style={styles.grow}>
                   PHS Visitor Sign-In
@@ -210,7 +230,7 @@ class App extends Component {
               </Tabs>
             </Paper>
             <Switch>
-              <Route exact path={routes.currentVisitors} render={(props) => <CurrentVisitors {...props} loggedIn={this.state.loggedIn}/>} />
+              <Route exact path={routes.currentVisitors} render={(props) => <CurrentVisitors {...props} loggedIn={this.state.loggedIn} printOn={this.state.printOn}/>} />
               <Route path={routes.previousVisitors} component={PreviousVisitors} />
               <Route component={Route404} />
             </Switch>

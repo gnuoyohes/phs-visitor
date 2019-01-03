@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "PHS Visitor Sign-In",
+  "name": "PHS Visitor Sign-In",
   "icons": [
     {
       "src": "favicon.ico",

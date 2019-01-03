@@ -21,8 +21,14 @@ const styles = {
   },
 }
 
+const padZeros = (num, size) => {
+    var s = num+"";
+    while (s.length < size) s = "0" + s;
+    return s;
+}
+
 const getDateString = (date) => {
-  var dateString = "" + (date.getMonth()+1) + date.getDate() + date.getFullYear();
+  var dateString = "" + date.getFullYear() + padZeros(date.getMonth()+1, 2) + padZeros(date.getDate(), 2);
   return dateString;
 };
 

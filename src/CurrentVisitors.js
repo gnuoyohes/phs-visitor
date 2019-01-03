@@ -16,8 +16,11 @@ import Grow from '@material-ui/core/Grow';
 
 import MUIDataTable from "mui-datatables";
 
+import ReactToPrint from "react-to-print";
+
 import colors from './constants/colors';
 import firebase from './components/firebase';
+import PrintCard from './PrintCard';
 
 const styles = {
   div: {
@@ -51,6 +54,11 @@ const styles = {
     marginBottom: 'auto',
     padding: '10px',
   },
+  printCard: {
+    position: 'absolute',
+    top: "25%", left: "25%", right: "25%", bottom: "25%",
+    zIndex: '-1'
+  },
 }
 
 const theme = createMuiTheme({
@@ -69,11 +77,15 @@ const theme = createMuiTheme({
   },
 });
 
-
+const padZeros = (num, size) => {
+    var s = num+"";
+    while (s.length < size) s = "0" + s;
+    return s;
+}
 
 const getCurrentDateString = () => {
   var d = new Date();
-  var dateString = "" + (d.getMonth()+1) + d.getDate() + d.getFullYear();
+  var dateString = "" + d.getFullYear() + padZeros(d.getMonth()+1, 2) + padZeros(d.getDate(), 2);
   return dateString;
 };
 
@@ -84,6 +96,8 @@ class CurrentVisitors extends Component {
       showAddForm: false,
       name: "",
       description: "",
+      printName: "",
+      printDescription: "",
       data: [],
       rowsPerPage: 10,
     };
@@ -135,7 +149,7 @@ class CurrentVisitors extends Component {
       'timeOut': "",
     });
     this.handleCloseAddForm();
-    this.setState({ name: "", description: "" });
+    this.setState({ printName: this.state.name, printDescription: this.state.description, name: "", description: "" })
   };
 
   handleRemoveVisitor = (key) => {
@@ -244,7 +258,7 @@ class CurrentVisitors extends Component {
                 <IconButton color="primary" aria-label="Close" onClick={this.handleCloseAddForm} style={styles.closeButton}>
                   <CloseIcon />
                 </IconButton>
-                <form style={styles.form} onSubmit={this.handleSubmit}>
+                <form style={styles.form} onSubmit={this.handleSubmit} ref={el => (this.printRef = el)}>
                   <TextField
                     autoFocus
                     style={styles.textField}
@@ -264,15 +278,32 @@ class CurrentVisitors extends Component {
                     onChange={this.handleChange('description')}
                     margin="normal"
                   />
-                  <div style={styles.button}>
-                    <Button variant="contained" color="primary" type="submit">
-                      Submit
-                    </Button>
-                  </div>
+                  {
+                    this.props.printOn ?
+                      <ReactToPrint
+                        trigger={() =>
+                          <div style={styles.button}>
+                            <Button variant="contained" color="primary" type="submit">
+                              Submit
+                            </Button>
+                          </div>
+                        }
+                        content={() => this.printComponentRef}
+                      />
+                    :
+                      <div style={styles.button}>
+                        <Button variant="contained" color="primary" type="submit">
+                          Submit
+                        </Button>
+                      </div>
+                  }
                 </form>
               </Paper>
             </Grow>
           </Modal>
+          <div style={styles.printCard}>
+            <PrintCard ref={el => (this.printComponentRef = el)} name={this.state.printName} description={this.state.printDescription}/>
+          </div>
         </MuiThemeProvider>
       </div>
     );
