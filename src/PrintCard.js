@@ -5,6 +5,8 @@ import Typography from '@material-ui/core/Typography';
 const styles = {
   div: {
     padding: '80px',
+    width: "400px",
+    height: "200px",
   },
   text: {
     paddingBottom: '10px',
@@ -14,22 +16,20 @@ const styles = {
 class PrintCard extends Component {
   render() {
     return (
-      <div>
-        <div style={styles.div}>
-          <Typography variant="h4" color="inherit" style={styles.text}>
-            Name:
-          </Typography>
-          <Typography variant="h3" color="inherit">
-            {this.props.name}
-          </Typography>
-          <br/><br/>
-          <Typography variant="h4" color="inherit" style={styles.text}>
-            Description:
-          </Typography>
-          <Typography variant="h5" color="inherit">
-            {this.props.description} <br/><br/>
-          </Typography>
-        </div>
+      <div style={styles.div}>
+        <Typography variant="h5" color="inherit" style={styles.text}>
+          Name:
+        </Typography>
+        <Typography variant="h4" color="inherit">
+          {this.props.name}
+        </Typography>
+        <br/>
+        <Typography variant="h5" color="inherit" style={styles.text}>
+          Description:
+        </Typography>
+        <Typography variant="body1" color="inherit">
+          {this.props.description} <br/><br/>
+        </Typography>
       </div>
     );
   }

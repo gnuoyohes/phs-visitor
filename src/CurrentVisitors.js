@@ -57,7 +57,14 @@ const styles = {
   printCard: {
     position: 'absolute',
     top: "25%", left: "25%", right: "25%", bottom: "25%",
-    zIndex: '-1'
+    zIndex: '-2',
+  },
+  background: {
+    position: 'absolute',
+    top: "0", left: "0",
+    width: "100%", height: "100%",
+    backgroundColor: colors.backgroundColor,
+    zIndex: '-1',
   },
 }
 
@@ -301,6 +308,8 @@ class CurrentVisitors extends Component {
               </Paper>
             </Grow>
           </Modal>
+          <div style={styles.background}>
+          </div>
           <div style={styles.printCard}>
             <PrintCard ref={el => (this.printComponentRef = el)} name={this.state.printName} description={this.state.printDescription}/>
           </div>
