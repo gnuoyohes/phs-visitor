@@ -29,7 +29,6 @@ class AppMobile extends Component {
         <Typography variant='h3' style={styles.text}>
           Sorry, not supported on mobile
         </Typography>
-        <img src={no} alt="No gif" style={styles.gif} />
       </div>
     );
   }
